@@ -1,0 +1,77 @@
+import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.meta.generics.LongPollingBot;
+
+import ai.openai.gpt.GPT;
+import ai.openai.gpt.GPTCompletionResult;
+
+public class MyTelegramBot extends TelegramLongPollingBot {
+    private final GPT gpt;
+
+    public MyTelegramBot() {
+        // Ініціалізація GPT-3 моделі
+        gpt = new GPT("your_openai_api_key");
+    }
+
+    @Override
+    public void onUpdateReceived(Update update) {
+        if (update.hasMessage() && update.getMessage().hasText()) {
+            Message message = update.getMessage();
+            String chatId = message.getChatId().toString();
+            String text = message.getText();
+
+            // Відповідь на будь-яке запитання
+            String response = generateResponse(text);
+
+            sendReplyMessage(chatId, response);
+        }
+    }
+
+    private String generateResponse(String input) {
+        // Використання GPT для генерації відповіді
+        GPTCompletionResult completionResult = gpt.complete(input);
+
+        if (completionResult.getChoices().isEmpty()) {
+            return "На жаль, не вдалося згенерувати відповідь.";
+        }
+
+        return completionResult.getChoices().get(0).getText();
+    }
+
+    private void sendReplyMessage(String chatId, String messageText) {
+        SendMessage message = new SendMessage();
+        message.setChatId(chatId);
+        message.setText(messageText);
+
+        try {
+            execute(message);
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public String getBotUsername() {
+        return "your_bot_username";
+    }
+
+    @Override
+    public String getBotToken() {
+        return "your_bot_token";
+    }
+
+    public static void main(String[] args) {
+        MyTelegramBot bot = new MyTelegramBot();
+        TelegramBotsApi botsApi = new TelegramBotsApi();
+
+        try {
+            botsApi.registerBot(bot);
+            System.out.println("Bot started!");
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
+    }
+}
