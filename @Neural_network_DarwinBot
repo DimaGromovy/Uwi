@@ -13,7 +13,7 @@ public class MyTelegramBot extends TelegramLongPollingBot {
 
     public MyTelegramBot() {
         // Ініціалізація GPT-3 моделі
-        gpt = new GPT("your_openai_api_key");
+        gpt = new GPT("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");
     }
 
     @Override
@@ -55,12 +55,12 @@ public class MyTelegramBot extends TelegramLongPollingBot {
 
     @Override
     public String getBotUsername() {
-        return "your_bot_username";
+        return "Neural_network_DarwinBot";
     }
 
     @Override
     public String getBotToken() {
-        return "your_bot_token";
+        return "5931659986:AAFn9pOp_mDsFD7VtzvY9rdaPJmXyJ6SGGc";
     }
 
     public static void main(String[] args) {
